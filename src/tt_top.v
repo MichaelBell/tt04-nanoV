@@ -17,7 +17,7 @@ module tt_um_MichaelBell_nanoV (
     wire spi_clk_enable;
     assign uo_out[0] = !clk && spi_clk_enable;
 
-    nanoV_cpu nano(
+    nanoV_cpu #(.NUM_REGS(8)) nano(
         .clk(clk), 
         .rstn(rst_n),
         .spi_data_in(spi_data_in), 
