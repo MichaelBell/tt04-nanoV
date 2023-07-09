@@ -22,6 +22,14 @@ module tt_um_MichaelBell_nanoV (
 
     assign uio_oe[7:0] = 8'h17;
 
+    // Bidi outputs used as inputs
+    assign uio_out[3] = 0;
+    assign uio_out[5] = 0;
+
+    // Bidi not used (yet)
+    assign uio_out[6] = 0;
+    assign uio_out[7] = 0;
+
     wire [31:0] data_out;
     wire is_data;
     wire is_addr;
