@@ -12,6 +12,7 @@ project:
     - nanoV/cpu.v
     - nanoV/register.v
     - nanoV/shift.v
+    - uart/uart_tx.v
   top_module:  "tt_um_MichaelBell_nanoV"      # Put the name of your top module here, must start with "tt_um_". Make it unique by including your github username
 
 # How many tiles your design occupies? A single tile is about 167x108 uM.
