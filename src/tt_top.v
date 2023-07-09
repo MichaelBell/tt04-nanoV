@@ -26,7 +26,6 @@ module tt_um_MichaelBell_nanoV (
     wire is_data;
     wire is_addr;
     reg [7:0] output_data;
-    reg [7:0] uart_tx_data;
     assign uo_out = output_data;
 
     nanoV_cpu #(.NUM_REGS(8)) nano(
@@ -40,8 +39,8 @@ module tt_um_MichaelBell_nanoV (
         .store_data_out(is_data),
         .store_addr_out(is_addr));
 
-    reg set_outputs, set_uart_tx, uart_tx_start;
-
+    reg set_outputs, set_uart_tx;
+    
     always @(posedge clk) begin
         if (!rst_n) begin 
             set_outputs <= 0;
@@ -53,13 +52,10 @@ module tt_um_MichaelBell_nanoV (
         end
 
         if (is_data && set_outputs) output_data <= data_out[7:0];
-        if (is_data && set_uart_tx) begin
-            uart_tx_data <= data_out[7:0];
-            uart_tx_start <= 1;
-        end else begin
-            uart_tx_start <= 0;
-        end
     end
+
+    wire uart_tx_start = is_data && set_uart_tx;
+    wire [7:0] uart_tx_data = data_out[7:0];
 
     uart_tx #(.CLK_HZ(24_000_000), .BIT_RATE(115_200)) i_uart_tx(
         .clk(clk),
