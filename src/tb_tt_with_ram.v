@@ -31,8 +31,8 @@ end
 
     tt_um_MichaelBell_nanoV top (
         `ifdef GL_TEST
-            .vccd1( 1'b1),
-            .vssd1( 1'b0),
+            .VPWR( 1'b1),
+            .VGND( 1'b0),
         `endif        
         .clk(clk),
         .rst_n(rstn),
