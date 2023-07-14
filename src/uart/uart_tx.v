@@ -90,7 +90,7 @@ wire next_bit     = cycle_counter == CYCLES_PER_BIT;
 
 //
 // Handle picking the next state.
-function [3:0] next_fsm_state(input [3:0] fsm_state, input tx_en, input next_bit);
+function [3:0] next_fsm_state(input tx_en);
     if (fsm_state == FSM_IDLE) begin
         if (tx_en) next_fsm_state = FSM_START;
         else next_fsm_state = FSM_IDLE;
@@ -143,7 +143,7 @@ always @(posedge clk) begin : p_fsm_state
     if(!resetn) begin
         fsm_state <= FSM_IDLE;
     end else begin
-        fsm_state <= next_fsm_state(fsm_state, uart_tx_en, next_bit);
+        fsm_state <= next_fsm_state(uart_tx_en);
     end
 end
 

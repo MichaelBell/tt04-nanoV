@@ -12,12 +12,13 @@ module tt_um_MichaelBell_nanoV (
 );
 
     wire spi_data_in = uio_in[3];
-    wire spi_select = uio_out[1];
-    wire spi_out = uio_out[2];
-    wire spi_clk_enable;
+    wire spi_select, spi_out, spi_clk_enable;
+    assign uio_out[1] = spi_select;
+    assign uio_out[2] = spi_out;
     assign uio_out[0] = !clk && spi_clk_enable;
 
-    wire uart_txd = uio_out[4];
+    wire uart_txd;
+    assign uio_out[4] = uart_txd;
     wire uart_rxd = uio_in[5];
 
     assign uio_oe[7:0] = 8'h17;
@@ -63,6 +64,7 @@ module tt_um_MichaelBell_nanoV (
     end
 
     wire uart_tx_start = is_data && set_uart_tx;
+    wire uart_tx_busy;
     wire [7:0] uart_tx_data = data_out[7:0];
 
     uart_tx #(.CLK_HZ(24_000_000), .BIT_RATE(115_200)) i_uart_tx(
@@ -70,7 +72,8 @@ module tt_um_MichaelBell_nanoV (
         .resetn(rst_n),
         .uart_txd(uart_txd),
         .uart_tx_en(uart_tx_start),
-        .uart_tx_data(uart_tx_data) 
+        .uart_tx_data(uart_tx_data),
+        .uart_tx_busy(uart_tx_busy) 
     );
 
 endmodule
