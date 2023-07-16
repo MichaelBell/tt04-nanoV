@@ -52,7 +52,7 @@ module tt_um_MichaelBell_nanoV (
     reg [7:0] output_data;
     assign uo_out = output_data;
 
-    nanoV_cpu #(.NUM_REGS(8)) nano(
+    nanoV_cpu #(.NUM_REGS(16)) nano(
         .clk(clk), 
         .rstn(rst_n),
         .spi_data_in(buffered_spi_in), 
@@ -88,7 +88,7 @@ module tt_um_MichaelBell_nanoV (
     wire uart_tx_busy;
     wire [7:0] uart_tx_data = reversed_data_out[7:0];
 
-    uart_tx #(.CLK_HZ(24_000_000), .BIT_RATE(115_200)) i_uart_tx(
+    uart_tx #(.CLK_HZ(20_000_000), .BIT_RATE(115_200)) i_uart_tx(
         .clk(clk),
         .resetn(rst_n),
         .uart_txd(uart_txd),
