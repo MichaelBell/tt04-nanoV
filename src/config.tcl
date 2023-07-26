@@ -29,7 +29,7 @@ set ::env(RIGHT_MARGIN_MULT) 6
 
 # absolute die size
 set ::env(FP_SIZING) absolute
-set ::env(FP_CORE_UTIL) 62
+set ::env(FP_CORE_UTIL) 65
 
 set ::env(PL_BASIC_PLACEMENT) {0}
 set ::env(GRT_ALLOW_CONGESTION) "1"

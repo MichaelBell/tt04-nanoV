@@ -91,8 +91,11 @@ module tt_um_MichaelBell_nanoV (
     end
 
     wire uart_tx_busy;
+    wire uart_rx_valid;
+    wire [7:0] uart_rx_data;
     assign data_in[31:8] = 0;
     assign data_in[7:0] = connect_gpios ? ui_in : 
+                          connect_uart ? uart_rx_data :
                           connect_uart_status ? {7'b0, uart_tx_busy} : 0;
 
     wire uart_tx_start = is_data && connect_uart;
@@ -105,6 +108,15 @@ module tt_um_MichaelBell_nanoV (
         .uart_tx_en(uart_tx_start),
         .uart_tx_data(uart_tx_data),
         .uart_tx_busy(uart_tx_busy) 
+    );
+
+    uart_rx #(.CLK_HZ(12_000_000), .BIT_RATE(115_200)) i_uart_rx(
+        .clk(clk),
+        .resetn(rst_n),
+        .uart_rxd(uart_rxd),
+        .uart_rx_read(connect_uart && is_data),
+        .uart_rx_valid(uart_rx_valid),
+        .uart_rx_data(uart_rx_data) 
     );
 
 endmodule
