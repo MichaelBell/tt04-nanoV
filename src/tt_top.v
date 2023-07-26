@@ -22,7 +22,9 @@ module tt_um_MichaelBell_nanoV (
     assign uio_out[4] = uart_txd;
     wire uart_rxd = uio_in[5];
 
-    assign uio_oe[7:0] = 8'h17;
+    // Switch all bidis to inputs when in reset (allows external programming of SPI RAM
+    // while in reset).
+    assign uio_oe[7:0] = rst_n ? 8'h17: 8'h00;
 
     // Bidi outputs used as inputs
     assign uio_out[3] = 0;
@@ -46,6 +48,7 @@ module tt_um_MichaelBell_nanoV (
         spi_mosi <= spi_data_nano;
     end
     
+    wire [31:0] data_in;
     wire [31:0] data_out;
     wire is_data;
     wire is_addr;
@@ -59,11 +62,12 @@ module tt_um_MichaelBell_nanoV (
         .spi_select(spi_select_nano), 
         .spi_out(spi_data_nano),
         .spi_clk_enable(spi_clk_enable),
+        .ext_data_in(data_in),
         .data_out(data_out),
         .store_data_out(is_data),
         .store_addr_out(is_addr));
 
-    reg set_outputs, set_uart_tx;
+    reg connect_gpios, connect_uart, connect_uart_status;
     
     wire [31:0] reversed_data_out;
     genvar i;
@@ -73,22 +77,28 @@ module tt_um_MichaelBell_nanoV (
 
     always @(posedge clk) begin
         if (!rst_n) begin 
-            set_outputs <= 0;
-            set_uart_tx <= 0;
+            connect_gpios <= 0;
+            connect_uart <= 0;
+            connect_uart_status <= 0;
         end
         else if (is_addr) begin
-            set_outputs <= (data_out == 32'h10000000);
-            set_uart_tx <= (data_out == 32'h10000100);
+            connect_gpios <= (data_out == 32'h10000000);
+            connect_uart <= (data_out == 32'h10001000);
+            connect_uart_status <= (data_out == 32'h10001004);
         end
 
-        if (is_data && set_outputs) output_data <= reversed_data_out[7:0];
+        if (is_data && connect_gpios) output_data <= reversed_data_out[7:0];
     end
 
-    wire uart_tx_start = is_data && set_uart_tx;
     wire uart_tx_busy;
+    assign data_in[31:8] = 0;
+    assign data_in[7:0] = connect_gpios ? ui_in : 
+                          connect_uart_status ? {7'b0, uart_tx_busy} : 0;
+
+    wire uart_tx_start = is_data && connect_uart;
     wire [7:0] uart_tx_data = reversed_data_out[7:0];
 
-    uart_tx #(.CLK_HZ(20_000_000), .BIT_RATE(115_200)) i_uart_tx(
+    uart_tx #(.CLK_HZ(12_000_000), .BIT_RATE(115_200)) i_uart_tx(
         .clk(clk),
         .resetn(rst_n),
         .uart_txd(uart_txd),
