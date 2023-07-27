@@ -18,20 +18,20 @@ module tt_um_MichaelBell_nanoV (
     assign uio_out[0] = !clk && spi_clk_enable;
     reg buffered_spi_in;
 
-    wire uart_txd;
+    wire uart_txd, uart_rts;
     assign uio_out[4] = uart_txd;
+    assign uio_out[6] = uart_rts;
     wire uart_rxd = uio_in[5];
 
-    // Switch all bidis to inputs when in reset (allows external programming of SPI RAM
+    // Switch SPI bidis to inputs when in reset (allows external programming of SPI RAM
     // while in reset).
-    assign uio_oe[7:0] = rst_n ? 8'h17: 8'h00;
+    assign uio_oe[7:0] = rst_n ? 8'h57: 8'h50;
 
     // Bidi outputs used as inputs
     assign uio_out[3] = 0;
     assign uio_out[5] = 0;
 
     // Bidi not used (yet)
-    assign uio_out[6] = 0;
     assign uio_out[7] = 0;
 
     always @(negedge clk) begin
@@ -83,8 +83,8 @@ module tt_um_MichaelBell_nanoV (
         end
         else if (is_addr) begin
             connect_gpios <= (data_out == 32'h10000000);
-            connect_uart <= (data_out == 32'h10001000);
-            connect_uart_status <= (data_out == 32'h10001004);
+            connect_uart <= (data_out == 32'h10000010);
+            connect_uart_status <= (data_out == 32'h10000014);
         end
 
         if (is_data && connect_gpios) output_data <= reversed_data_out[7:0];
@@ -101,7 +101,7 @@ module tt_um_MichaelBell_nanoV (
     wire uart_tx_start = is_data && connect_uart;
     wire [7:0] uart_tx_data = reversed_data_out[7:0];
 
-    uart_tx #(.CLK_HZ(12_000_000), .BIT_RATE(115_200)) i_uart_tx(
+    uart_tx #(.CLK_HZ(12_000_000), .BIT_RATE(28_800)) i_uart_tx(
         .clk(clk),
         .resetn(rst_n),
         .uart_txd(uart_txd),
@@ -110,10 +110,11 @@ module tt_um_MichaelBell_nanoV (
         .uart_tx_busy(uart_tx_busy) 
     );
 
-    uart_rx #(.CLK_HZ(12_000_000), .BIT_RATE(115_200)) i_uart_rx(
+    uart_rx #(.CLK_HZ(12_000_000), .BIT_RATE(28_800)) i_uart_rx(
         .clk(clk),
         .resetn(rst_n),
         .uart_rxd(uart_rxd),
+        .uart_rts(uart_rts),
         .uart_rx_read(connect_uart && is_data),
         .uart_rx_valid(uart_rx_valid),
         .uart_rx_data(uart_rx_data) 

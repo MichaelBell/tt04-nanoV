@@ -10,10 +10,11 @@ async def test_start(nv):
     cocotb.start_soon(clock.start())
     nv.rstn.value = 0
     await ClockCycles(nv.clk, 2)
+    assert nv.uio_oe.value == 0x50
     nv.rstn.value = 1
     await ClockCycles(nv.clk, 1)
 
     # Check the outputs are configured correctly
-    assert nv.uio_oe.value == 0x17
+    assert nv.uio_oe.value == 0x57
 
-    await Timer(200, "us")
+    await Timer(800, "us")
