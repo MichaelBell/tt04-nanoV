@@ -13,9 +13,9 @@ module tt_um_MichaelBell_nanoV (
 
     reg spi_select, spi_mosi;
     wire spi_clk_enable;
-    assign uio_out[1] = spi_select;
-    assign uio_out[2] = spi_mosi;
-    assign uio_out[0] = !clk && spi_clk_enable;
+    assign uio_out[2] = spi_select;
+    assign uio_out[0] = spi_mosi;
+    assign uio_out[1] = !clk && spi_clk_enable;
     reg buffered_spi_in;
 
     wire uart_txd, uart_rts;
