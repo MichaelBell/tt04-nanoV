@@ -50,7 +50,7 @@ module tt_um_MichaelBell_nanoV (
     
     wire [31:0] data_in;
     wire [31:0] data_out;
-    wire is_data;
+    wire is_data, is_data_in;
     wire is_addr;
     reg [7:0] output_data;
     assign uo_out = output_data;
@@ -65,7 +65,8 @@ module tt_um_MichaelBell_nanoV (
         .ext_data_in(data_in),
         .data_out(data_out),
         .store_data_out(is_data),
-        .store_addr_out(is_addr));
+        .store_addr_out(is_addr),
+        .data_in_read(is_data_in));
 
     reg connect_gpios, connect_uart, connect_uart_status;
     
@@ -101,7 +102,7 @@ module tt_um_MichaelBell_nanoV (
     wire uart_tx_start = is_data && connect_uart;
     wire [7:0] uart_tx_data = reversed_data_out[7:0];
 
-    uart_tx #(.CLK_HZ(12_000_000), .BIT_RATE(28_800)) i_uart_tx(
+    uart_tx #(.CLK_HZ(12_000_000), .BIT_RATE(93_750)) i_uart_tx(
         .clk(clk),
         .resetn(rst_n),
         .uart_txd(uart_txd),
@@ -110,12 +111,12 @@ module tt_um_MichaelBell_nanoV (
         .uart_tx_busy(uart_tx_busy) 
     );
 
-    uart_rx #(.CLK_HZ(12_000_000), .BIT_RATE(28_800)) i_uart_rx(
+    uart_rx #(.CLK_HZ(12_000_000), .BIT_RATE(93_750)) i_uart_rx(
         .clk(clk),
         .resetn(rst_n),
         .uart_rxd(uart_rxd),
         .uart_rts(uart_rts),
-        .uart_rx_read(connect_uart && is_data),
+        .uart_rx_read(connect_uart && is_data_in),
         .uart_rx_valid(uart_rx_valid),
         .uart_rx_data(uart_rx_data) 
     );
