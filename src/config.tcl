@@ -58,3 +58,6 @@ set ::env(CLOCK_PORT) {clk}
 # don't use power rings or met5
 set ::env(DESIGN_IS_CORE) 0
 set ::env(RT_MAX_LAYER) {met4}
+
+# Make linter use SIM version of Verilog
+set ::env(LINTER_DEFINES) "SIM"

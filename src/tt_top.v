@@ -34,19 +34,18 @@ module tt_um_MichaelBell_nanoV (
     // Bidi not used (yet)
     assign uio_out[7] = 0;
 
-    always @(negedge clk) begin
+    always @(negedge clk)
         buffered_spi_in <= uio_in[3];
-    end
 
     wire spi_data_nano, spi_select_nano;
-    always @(posedge clk) begin
+    always @(posedge clk or negedge rst_n)
         if (!rst_n)
             spi_select <= 1;
         else
             spi_select <= spi_select_nano;
 
+    always @(posedge clk)
         spi_mosi <= spi_data_nano;
-    end
     
     wire [31:0] data_in;
     wire [31:0] data_out;
