@@ -5,7 +5,9 @@ module tb_tt_with_ram (
     input rstn,
     input [7:0] ui_in,
     output [7:0] uo_out,
-    output uart_tx
+    input uart_rxd,
+    output uart_txd,
+    output uart_rts
 );
 
 `ifdef COCOTB_SIM
@@ -22,12 +24,13 @@ end
 
     wire spi_miso, spi_select, spi_clk, spi_mosi;
     assign uio_in[3] = spi_miso;
-    assign spi_select = uio_out[1];
-    assign spi_clk = uio_out[0];
-    assign spi_mosi = uio_out[2];
+    assign spi_select = uio_out[2];
+    assign spi_clk = uio_out[1];
+    assign spi_mosi = uio_out[0];
 
     assign uio_in[2:0] = 0;
-    assign uio_in[7:4] = 0;
+    assign uio_in[4] = 0;
+    assign uio_in[7:6] = 0;
 
     tt_um_MichaelBell_nanoV top (
         `ifdef GL_TEST
@@ -44,7 +47,9 @@ end
         .uio_oe(uio_oe)
     );
 
-    assign uart_tx = uio_out[4];
+    assign uio_in[5] = uart_rxd;
+    assign uart_rts = uio_out[6];
+    assign uart_txd = uio_out[4];
 
     wire debug_clk;
     wire [23:0] debug_addr;

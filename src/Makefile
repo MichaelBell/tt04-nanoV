@@ -13,7 +13,7 @@ ifneq ($(GATES),yes)
 
 # this is the only part you should need to modify:
 VERILOG_SOURCES += $(PWD)/tb_tt_with_ram.v $(PWD)/nanoV/sim_sram.v $(PWD)/tt_top.v
-VERILOG_SOURCES += $(PWD)/nanoV/alu.v $(PWD)/nanoV/core.v $(PWD)/nanoV/cpu.v $(PWD)/nanoV/register.v $(PWD)/nanoV/shift.v 
+VERILOG_SOURCES += $(PWD)/nanoV/alu.v $(PWD)/nanoV/core.v $(PWD)/nanoV/cpu.v $(PWD)/nanoV/register.v $(PWD)/nanoV/shift.v $(PWD)/nanoV/multiply.v
 VERILOG_SOURCES += $(PWD)/nanoV/uart/uart_tx.v $(PWD)/nanoV/uart/uart_rx.v
 
 else
