@@ -38,7 +38,7 @@ module tt_um_MichaelBell_nanoV (
         buffered_spi_in <= uio_in[3];
 
     wire spi_data_nano, spi_select_nano;
-    always @(posedge clk or negedge rst_n)
+    always @(posedge clk)
         if (!rst_n)
             spi_select <= 1;
         else
