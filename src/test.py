@@ -33,7 +33,7 @@ async def send_byte(nv, val, wait_for_ready=False, bit_time = 1000000000 // 9375
 
 async def recv_byte(nv, val, bit_time = 1000000000 // 93750):
     assert nv.uart_txd.value == 1
-    await First(FallingEdge(nv.uart_txd), Timer(200, "us"))
+    await First(FallingEdge(nv.uart_txd), Timer(1000, "us"))
     assert nv.uart_txd.value == 0
 
     await Timer(bit_time//2, "ns")
@@ -51,7 +51,7 @@ async def recv_byte(nv, val, bit_time = 1000000000 // 93750):
 
 @cocotb.test()
 async def test_start(nv):
-    random.seed(1691097577)
+    #random.seed(1691498696)
     clock = Clock(nv.clk, 83, units="ns")
     cocotb.start_soon(clock.start())
     nv.rstn.value = 0
@@ -118,3 +118,33 @@ async def test_start(nv):
     await recv_byte(nv, (a >> 8) & 0xFF)
     await recv_byte(nv, (a >> 16) & 0xFF)
     await recv_byte(nv, (a >> 24) & 0xFF)
+
+    a = random.randint(0, 0x7FFFFFFFFFFFFFFF)
+    b = random.randint(0, 0x7FFFFFFFFFFFFFFF)
+    print(a, b)
+    await send_byte(nv, a >> 56)
+    await send_byte(nv, a >> 48, True)
+    await send_byte(nv, a >> 40, True)
+    await send_byte(nv, a >> 32, True)
+    await send_byte(nv, a >> 24, True)
+    await send_byte(nv, a >> 16, True)
+    await send_byte(nv, a >> 8, True)
+    await send_byte(nv, a, True)
+    await send_byte(nv, b >> 56, True)
+    await send_byte(nv, b >> 48, True)
+    await send_byte(nv, b >> 40, True)
+    await send_byte(nv, b >> 32, True)
+    await send_byte(nv, b >> 24, True)
+    await send_byte(nv, b >> 16, True)
+    await send_byte(nv, b >> 8, True)
+    await send_byte(nv, b, True)
+
+    a = (a * b) & 0xFFFFFFFFFFFFFFFF
+    await recv_byte(nv, a & 0xFF)
+    await recv_byte(nv, (a >> 8) & 0xFF)
+    await recv_byte(nv, (a >> 16) & 0xFF)
+    await recv_byte(nv, (a >> 24) & 0xFF)    
+    await recv_byte(nv, (a >> 32) & 0xFF)    
+    await recv_byte(nv, (a >> 40) & 0xFF)    
+    await recv_byte(nv, (a >> 48) & 0xFF)    
+    await recv_byte(nv, (a >> 56) & 0xFF)    
