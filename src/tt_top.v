@@ -48,6 +48,7 @@ module tt_um_MichaelBell_nanoV (
         spi_mosi <= spi_data_nano;
     
     wire [31:0] data_in;
+    wire [31:0] addr_out;
     wire [31:0] data_out;
     wire is_data, is_data_in;
     wire is_addr;
@@ -62,6 +63,7 @@ module tt_um_MichaelBell_nanoV (
         .spi_out(spi_data_nano),
         .spi_clk_enable(spi_clk_enable),
         .ext_data_in(data_in),
+        .addr_out(addr_out),
         .data_out(data_out),
         .store_data_out(is_data),
         .store_addr_out(is_addr),
@@ -74,24 +76,18 @@ module tt_um_MichaelBell_nanoV (
 
     reg [1:0] connect_peripheral;
     
-    wire [31:0] reversed_data_out;
-    genvar i;
-    generate 
-      for (i=0; i<32; i=i+1) assign reversed_data_out[i] = data_out[31-i]; 
-    endgenerate
-
     always @(posedge clk) begin
         if (!rst_n) begin 
             connect_peripheral <= PERI_NONE;
         end
         else if (is_addr) begin
-            if (data_out == 32'h10000000) connect_peripheral <= PERI_GPIO;
-            else if (data_out == 32'h10000010) connect_peripheral <= PERI_UART;
-            else if (data_out == 32'h10000014) connect_peripheral <= PERI_UART_STATUS;
+            if (addr_out == 32'h10000000) connect_peripheral <= PERI_GPIO;
+            else if (addr_out == 32'h10000010) connect_peripheral <= PERI_UART;
+            else if (addr_out == 32'h10000014) connect_peripheral <= PERI_UART_STATUS;
             else connect_peripheral <= PERI_NONE;
         end
 
-        if (is_data && connect_peripheral == PERI_GPIO) output_data <= reversed_data_out[7:0];
+        if (is_data && connect_peripheral == PERI_GPIO) output_data <= data_out[7:0];
     end
 
     wire uart_tx_busy;
@@ -103,7 +99,7 @@ module tt_um_MichaelBell_nanoV (
                           connect_peripheral == PERI_UART_STATUS ? {6'b0, uart_rx_valid, uart_tx_busy} : 0;
 
     wire uart_tx_start = is_data && connect_peripheral == PERI_UART;
-    wire [7:0] uart_tx_data = reversed_data_out[7:0];
+    wire [7:0] uart_tx_data = data_out[7:0];
 
     uart_tx #(.CLK_HZ(12_000_000), .BIT_RATE(93_750)) i_uart_tx(
         .clk(clk),
