@@ -13,10 +13,17 @@ module tt_um_MichaelBell_nanoV (
 
     reg spi_select, spi_mosi;
     wire spi_clk_enable;
+    wire buffered_spi_clk_enable;
     assign uio_out[2] = spi_select;
     assign uio_out[0] = spi_mosi;
-    assign uio_out[1] = !clk && spi_clk_enable;
+    assign uio_out[1] = !clk && buffered_spi_clk_enable;
     reg buffered_spi_in;
+
+`ifdef SIM
+    assign buffered_spi_clk_enable = spi_clk_enable;
+`else
+    sky130_fd_sc_hd__buf_2 i_buf ( .X(buffered_spi_clk_enable), .A(spi_clk_enable) );
+`endif
 
     wire uart_txd, uart_rts;
     assign uio_out[4] = uart_txd;
