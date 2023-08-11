@@ -62,7 +62,7 @@ async def test_start(nv):
     await ClockCycles(nv.clk, 2)
 
     # Check the outputs are configured correctly
-    assert nv.uio_oe.value == 0x57
+    assert nv.uio_oe.value == 0xD7
     assert nv.uart_txd.value == 1
     assert nv.uart_rts.value == 0
 

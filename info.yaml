@@ -49,7 +49,7 @@ documentation:
 
       The gp and tp registers are not written to by normal programs compiled by gcc, so the regular build of gcc can be used to build programs.
 
-      The inputs and outputs are for general purpose use from the CPU, they can be read or written at address 0x10000000.
+      The inputs and outputs are for general purpose use from the CPU, they outputs can be written at address 0x10000000, and inputs read at 0x10000004.
 
       The UART runs at clock speed / 128 (e.g. 93750 baud with a 12MHz clock).  Bytes can be written or read at address 0x10000010.
       The UART provides 2 bits of status at address 0x10000014:
@@ -94,7 +94,7 @@ documentation:
     - UART TX
     - UART RX
     - UART RTS
-    - none
+    - SPI RAM ~Hold
 
 # The following fields are optional
   tag:          "riscv"      # comma separated list of tags: test, encryption, experiment, clock, animation, utility, industrial, pwm, fpga, alu, microprocessor, risc, riscv, sensor, signal generator, fft, filter, music, bcd, sound, serial, timer, random number generator, calculator, decoder, counter, puzzle, multiplier, game, oscillator,

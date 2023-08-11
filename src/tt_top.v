@@ -17,12 +17,13 @@ module tt_um_MichaelBell_nanoV (
     assign uio_out[2] = spi_select;
     assign uio_out[0] = spi_mosi;
     assign uio_out[1] = !clk && buffered_spi_clk_enable;
+    assign uio_out[7] = spi_clk_enable;
     reg buffered_spi_in;
 
 `ifdef SIM
     assign buffered_spi_clk_enable = spi_clk_enable;
 `else
-    sky130_fd_sc_hd__buf_2 i_buf ( .X(buffered_spi_clk_enable), .A(spi_clk_enable) );
+    sky130_fd_sc_hd__buf_1 i_buf ( .X(buffered_spi_clk_enable), .A(spi_clk_enable) );
 `endif
 
     wire uart_txd, uart_rts;
@@ -32,14 +33,11 @@ module tt_um_MichaelBell_nanoV (
 
     // Switch SPI bidis to inputs when in reset (allows external programming of SPI RAM
     // while in reset).
-    assign uio_oe[7:0] = rst_n ? 8'h57: 8'h50;
+    assign uio_oe[7:0] = rst_n ? 8'b11010111: 8'b01010000;
 
     // Bidi outputs used as inputs
     assign uio_out[3] = 0;
     assign uio_out[5] = 0;
-
-    // Bidi not used (yet)
-    assign uio_out[7] = 0;
 
     always @(negedge clk)
         buffered_spi_in <= uio_in[3];
@@ -77,31 +75,34 @@ module tt_um_MichaelBell_nanoV (
         .data_in_read(is_data_in));
 
     localparam PERI_NONE = 0;
-    localparam PERI_GPIO = 1;
-    localparam PERI_UART = 2;
-    localparam PERI_UART_STATUS = 3;
+    localparam PERI_GPIO_OUT = 2;
+    localparam PERI_GPIO_IN = 3;
+    localparam PERI_UART = 4;
+    localparam PERI_UART_STATUS = 5;
 
-    reg [1:0] connect_peripheral;
+    reg [2:0] connect_peripheral;
     
     always @(posedge clk) begin
         if (!rst_n) begin 
             connect_peripheral <= PERI_NONE;
         end
         else if (is_addr) begin
-            if (addr_out == 32'h10000000) connect_peripheral <= PERI_GPIO;
+            if (addr_out == 32'h10000000) connect_peripheral <= PERI_GPIO_OUT;
+            else if (addr_out == 32'h10000004) connect_peripheral <= PERI_GPIO_IN;
             else if (addr_out == 32'h10000010) connect_peripheral <= PERI_UART;
             else if (addr_out == 32'h10000014) connect_peripheral <= PERI_UART_STATUS;
             else connect_peripheral <= PERI_NONE;
         end
 
-        if (is_data && connect_peripheral == PERI_GPIO) output_data <= data_out[7:0];
+        if (is_data && connect_peripheral == PERI_GPIO_OUT) output_data <= data_out[7:0];
     end
 
     wire uart_tx_busy;
     wire uart_rx_valid;
     wire [7:0] uart_rx_data;
     assign data_in[31:8] = 0;
-    assign data_in[7:0] = connect_peripheral == PERI_GPIO ? ui_in : 
+    assign data_in[7:0] = connect_peripheral == PERI_GPIO_OUT ? output_data :
+                          connect_peripheral == PERI_GPIO_IN ? ui_in : 
                           connect_peripheral == PERI_UART ? uart_rx_data :
                           connect_peripheral == PERI_UART_STATUS ? {6'b0, uart_rx_valid, uart_tx_busy} : 0;
 
