@@ -14,9 +14,9 @@ module tt_um_MichaelBell_nanoV (
     reg spi_select, spi_mosi;
     wire spi_clk_enable;
     wire buffered_spi_clk_enable;
-    assign uio_out[2] = spi_select;
+    assign uio_out[1] = spi_select;
     assign uio_out[0] = spi_mosi;
-    assign uio_out[1] = !clk && buffered_spi_clk_enable;
+    assign uio_out[2] = !clk && buffered_spi_clk_enable;
     assign uio_out[7] = spi_clk_enable;
     reg buffered_spi_in;
 
@@ -27,17 +27,17 @@ module tt_um_MichaelBell_nanoV (
 `endif
 
     wire uart_txd, uart_rts;
-    assign uio_out[4] = uart_txd;
+    assign uio_out[5] = uart_txd;
     assign uio_out[6] = uart_rts;
-    wire uart_rxd = uio_in[5];
+    wire uart_rxd = uio_in[4];
 
     // Switch SPI bidis to inputs when in reset (allows external programming of SPI RAM
     // while in reset).
-    assign uio_oe[7:0] = rst_n ? 8'b11010111: 8'b01010000;
+    assign uio_oe[7:0] = rst_n ? 8'b11100111: 8'b01100000;
 
     // Bidi outputs used as inputs
     assign uio_out[3] = 0;
-    assign uio_out[5] = 0;
+    assign uio_out[4] = 0;
 
     always @(negedge clk)
         buffered_spi_in <= uio_in[3];

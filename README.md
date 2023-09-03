@@ -6,7 +6,7 @@ A minimal RV32E processor using an SPI RAM for instructions and data.
 
 The SPI RAM and a UART are connected to the bidi IOs.  The SPI RAM is clocked at the same speed as the input clock.
       
-The CPU has no instruction or data cache and effectively runs at clock speed / 32.  More details on th eimplementation can be found in the [nanoV](https://github.com/MichaelBell/nanoV) repo.
+The CPU has no instruction or data cache and effectively runs at clock speed / 32.  More details on the implementation can be found in the [nanoV](https://github.com/MichaelBell/nanoV) repo.  The [nanoV-sdk](https://github.com/MichaelBell/nanoV-sdk) has peripheral access and startup code.
 
 # What is Tiny Tapeout?
 

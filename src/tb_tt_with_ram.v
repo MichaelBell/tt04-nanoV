@@ -24,13 +24,12 @@ end
 
     wire spi_miso, spi_select, spi_clk, spi_mosi;
     assign uio_in[3] = spi_miso;
-    assign spi_select = uio_out[2];
-    assign spi_clk = uio_out[1];
+    assign spi_select = uio_out[1];
+    assign spi_clk = uio_out[2];
     assign spi_mosi = uio_out[0];
 
     assign uio_in[2:0] = 0;
-    assign uio_in[4] = 0;
-    assign uio_in[7:6] = 0;
+    assign uio_in[7:5] = 0;
 
     tt_um_MichaelBell_nanoV top (
         `ifdef GL_TEST
@@ -47,9 +46,9 @@ end
         .uio_oe(uio_oe)
     );
 
-    assign uio_in[5] = uart_rxd;
+    assign uio_in[4] = uart_rxd;
     assign uart_rts = uio_out[6];
-    assign uart_txd = uio_out[4];
+    assign uart_txd = uio_out[5];
 
     wire debug_clk;
     wire [23:0] debug_addr;
