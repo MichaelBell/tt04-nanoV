@@ -20,7 +20,11 @@ tt = DemoBoard()
 tt.shuttle.tt_um_MichaelBell_nanoV.enable()
 
 def run(query=True, stop=True):
-    machine.mem32[0x40064000] = 0xd1
+    #project_clock = 16_000_000
+    project_clock = 14_777_777
+    
+    machine.mem32[0x40064000] = 0xc1  # c1 = 1.15V, d1 = 1.2V, etc
+    #machine.freq(project_clock * 20)
     machine.freq(266_000_000)
 
     if query:
@@ -35,7 +39,7 @@ def run(query=True, stop=True):
 
     capture = False
     if capture:
-        sm = rp2.StateMachine(0, pio_capture, 4_000_000, in_base=Pin(21))
+        sm = rp2.StateMachine(0, pio_capture, project_clock * 2, in_base=Pin(21))
 
         capture_len=1024
         buf = bytearray(capture_len)
@@ -58,7 +62,7 @@ def run(query=True, stop=True):
 
     #uart = UART(0, baudrate=93750//6, tx=Pin(0), rx=Pin(1), timeout=100, timeout_char=10)
     time.sleep(0.001)
-    tt.clock_project_PWM(14_777_777)
+    tt.clock_project_PWM(project_clock)
     print(machine.mem32[0x400140c4])
 
     if capture:
